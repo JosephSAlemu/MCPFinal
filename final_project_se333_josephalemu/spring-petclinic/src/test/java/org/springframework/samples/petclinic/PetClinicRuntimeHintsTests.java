@@ -15,6 +15,9 @@
  */
 package org.springframework.samples.petclinic;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.predicate.RuntimeHintsPredicates;
@@ -30,13 +33,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PetClinicRuntimeHintsTests {
 
 	@Test
-	void shouldRegisterHints() {
+	void shouldRegisterResourcePatternHints() {
 		RuntimeHints hints = new RuntimeHints();
 		new PetClinicRuntimeHints().registerHints(hints, getClass().getClassLoader());
 
-		assertThat(RuntimeHintsPredicates.resource().forPattern("db/*")).accepts(hints);
-		assertThat(RuntimeHintsPredicates.resource().forPattern("messages/*")).accepts(hints);
-		assertThat(RuntimeHintsPredicates.resource().forPattern("mysql-default-conf")).accepts(hints);
+		List<String> patterns = hints.resources()
+			.resourcePatternHints()
+			.flatMap(h -> h.getIncludes().stream())
+			.map(h -> h.getPattern())
+			.collect(Collectors.toList());
+
+		assertThat(patterns).contains("db/*", "messages/*", "mysql-default-conf");
+	}
+
+	@Test
+	void shouldRegisterSerializationHints() {
+		RuntimeHints hints = new RuntimeHints();
+		new PetClinicRuntimeHints().registerHints(hints, getClass().getClassLoader());
+
 		assertThat(RuntimeHintsPredicates.serialization().onType(BaseEntity.class)).accepts(hints);
 		assertThat(RuntimeHintsPredicates.serialization().onType(Person.class)).accepts(hints);
 		assertThat(RuntimeHintsPredicates.serialization().onType(Vet.class)).accepts(hints);
