@@ -56,4 +56,33 @@ class PetClinicRuntimeHintsTests {
 		assertThat(RuntimeHintsPredicates.serialization().onType(Vet.class)).accepts(hints);
 	}
 
+	// --- Equivalence Partitioning Tests ---
+
+	/** EC: valid classLoader - valid class loader instance */
+	@Test
+	void testRegisterHints_Valid_classLoader_valid_instance() {
+		RuntimeHints hints = new RuntimeHints();
+		ClassLoader classLoader = getClass().getClassLoader();
+		new PetClinicRuntimeHints().registerHints(hints, classLoader);
+
+		List<String> patterns = hints.resources()
+			.resourcePatternHints()
+			.flatMap(h -> h.getIncludes().stream())
+			.map(h -> h.getPattern())
+			.collect(Collectors.toList());
+		assertThat(patterns).isNotEmpty();
+	}
+
+	/** EC: invalid classLoader - null classLoader (API accepts null) */
+	@Test
+	void testRegisterHints_Invalid_classLoader_null() {
+		RuntimeHints hints = new RuntimeHints();
+		// registerHints accepts null classLoader - should execute without throwing
+		new PetClinicRuntimeHints().registerHints(hints, null);
+
+		assertThat(RuntimeHintsPredicates.serialization().onType(BaseEntity.class)).accepts(hints);
+		assertThat(RuntimeHintsPredicates.serialization().onType(Person.class)).accepts(hints);
+		assertThat(RuntimeHintsPredicates.serialization().onType(Vet.class)).accepts(hints);
+	}
+
 }

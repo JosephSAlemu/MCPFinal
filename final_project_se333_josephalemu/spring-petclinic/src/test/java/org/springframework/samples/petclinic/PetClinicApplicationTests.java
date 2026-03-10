@@ -40,4 +40,46 @@ class PetClinicApplicationTests {
 		}
 	}
 
+	// --- Equivalence Partitioning Tests ---
+
+	/** EC: valid args - typical non-empty args array */
+	@Test
+	void testMain_Valid_args_typical() {
+		try (MockedStatic<SpringApplication> mocked = Mockito.mockStatic(SpringApplication.class)) {
+			String[] args = { "hello" };
+			PetClinicApplication.main(args);
+			mocked.verify(() -> SpringApplication.run(PetClinicApplication.class, args));
+		}
+	}
+
+	/** EC: valid args - single character argument */
+	@Test
+	void testMain_Valid_args_single_char() {
+		try (MockedStatic<SpringApplication> mocked = Mockito.mockStatic(SpringApplication.class)) {
+			String[] args = { "a" };
+			PetClinicApplication.main(args);
+			mocked.verify(() -> SpringApplication.run(PetClinicApplication.class, args));
+		}
+	}
+
+	/** EC: valid args - args containing spaces */
+	@Test
+	void testMain_Valid_args_with_spaces() {
+		try (MockedStatic<SpringApplication> mocked = Mockito.mockStatic(SpringApplication.class)) {
+			String[] args = { "hello world" };
+			PetClinicApplication.main(args);
+			mocked.verify(() -> SpringApplication.run(PetClinicApplication.class, args));
+		}
+	}
+
+	/** EC: valid args - empty string array (no args passed) */
+	@Test
+	void testMain_Invalid_args_empty() {
+		try (MockedStatic<SpringApplication> mocked = Mockito.mockStatic(SpringApplication.class)) {
+			String[] args = new String[0];
+			PetClinicApplication.main(args);
+			mocked.verify(() -> SpringApplication.run(PetClinicApplication.class, args));
+		}
+	}
+
 }
