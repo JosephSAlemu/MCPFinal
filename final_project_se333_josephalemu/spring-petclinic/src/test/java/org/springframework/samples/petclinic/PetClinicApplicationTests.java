@@ -16,6 +16,9 @@
 package org.springframework.samples.petclinic;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -29,4 +32,13 @@ class PetClinicApplicationTests {
 		// Verifies the Spring application context loads successfully
 	}
 
+	@Test
+	void mainMethodCallsSpringApplicationRun() {
+		try (MockedStatic<SpringApplication> mocked = Mockito.mockStatic(SpringApplication.class)) {
+			PetClinicApplication.main(new String[] {});
+			mocked.verify(() -> SpringApplication.run(PetClinicApplication.class, new String[] {}));
+		}
+	}
+
 }
+
